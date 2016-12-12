@@ -268,13 +268,5 @@ namespace ShapeFilesParser.Business
             return shapes;
         }
 
-
-        private Point GetPoint(byte[] recordContent)
-        {
-            var x = parser.ReadDouble(recordContent, 4, true);
-            var y = parser.ReadDouble(recordContent, 12, true);
-            return new Point(x, y);
-        }
-
     }
 }
