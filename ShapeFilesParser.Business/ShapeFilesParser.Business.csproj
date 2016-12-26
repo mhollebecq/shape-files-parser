@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="MetadataColumn.cs" />
     <Compile Include="MetadataRecord.cs" />
+    <Compile Include="Parsers\BaseShapeParser.cs" />
     <Compile Include="Parsers\PointZParser.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="ShapeManager.cs" />
