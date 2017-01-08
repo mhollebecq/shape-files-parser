@@ -9,17 +9,10 @@ namespace ShapeFilesParser.Business.Parsers
 {
     public class PolygonZParser : BaseShapeParser<PolygonZ>
     {
-        //private PointParser _pointParser;
-
-        public PolygonZParser()// : this(new PointParser())
+        public PolygonZParser()
         {
 
         }
-
-        //public PolygonZParser(PointParser pointParser)
-        //{
-        //    this._pointParser = pointParser;
-        //}
 
         public override PolygonZ Parse(byte[] recordContent)
         {
