@@ -45,8 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MetadataColumn.cs" />
+    <Compile Include="Models\Point.cs" />
     <Compile Include="Models\PolygonZ.cs" />
     <Compile Include="Parsers\BaseShapeParser.cs" />
+    <Compile Include="Parsers\PointParser.cs" />
     <Compile Include="Parsers\PointZParser.cs" />
     <Compile Include="Parsers\PolygonZParser.cs" />
     <Compile Include="Shape.cs" />
