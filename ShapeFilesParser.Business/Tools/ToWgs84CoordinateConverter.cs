@@ -44,6 +44,8 @@ namespace ShapeFilesParser.Tools
 
         public void Convert(double sourceX, double sourceY, out double lat, out double lon)
         {
+            double halfMinorAxis = _halfMajorAxis * (1 - _flattening);
+            double eccentricity = Math.Sqrt((Math.Pow(_halfMajorAxis, 2) - Math.Pow(halfMinorAxis, 2)) / ((Math.Pow(_halfMajorAxis, 2))));
             throw new NotImplementedException();
         }
     }
