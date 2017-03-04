@@ -22,7 +22,7 @@ namespace ShapeFilesParser.Business.Parsers
             }
         }
 
-        public override PolygonZ Parse(byte[] recordContent)
+        public override PolygonZ Parse(byte[] recordContent, ReadIntDelegate readInt, ReadDoubleDelegate readDouble)
         {
             //PolygonZ
             //{
@@ -36,24 +36,24 @@ namespace ShapeFilesParser.Business.Parsers
             //                Double[2] M Range // Bounding Measure Range
             //                Double[NumPoints] M Array // Measures
             //}
-            int shapeType = ReadInt(recordContent, 0, true);
+            int shapeType = readInt(recordContent, 0, true);
 
             double Xmin, Ymin, Xmax, Ymax;//Bounding box
             int numParts, numPoints;
 
-            Xmin = ReadDouble(recordContent, 4, true);
-            Ymin = ReadDouble(recordContent, 12, true);
-            Xmax = ReadDouble(recordContent, 20, true);
-            Ymax = ReadDouble(recordContent, 28, true);
+            Xmin = readDouble(recordContent, 4, true);
+            Ymin = readDouble(recordContent, 12, true);
+            Xmax = readDouble(recordContent, 20, true);
+            Ymax = readDouble(recordContent, 28, true);
 
-            numParts = ReadInt(recordContent, 36, true);
-            numPoints = ReadInt(recordContent, 40, true);
+            numParts = readInt(recordContent, 36, true);
+            numPoints = readInt(recordContent, 40, true);
 
             int[] partsArray = new int[numParts];
             for (int iParts = 0; iParts < numParts; iParts++)
             {
                 int indexPart = 44 + iParts * 4;
-                partsArray[iParts] = ReadInt(recordContent, indexPart, true);
+                partsArray[iParts] = readInt(recordContent, indexPart, true);
             }
 
             Point[] pointsArray = new Point[numPoints];
@@ -62,32 +62,32 @@ namespace ShapeFilesParser.Business.Parsers
             {
                 int indexPoint = startPoints + iPoints * 16;
                 pointsArray[iPoints] = new Point(
-                    ReadDouble(recordContent, indexPoint, true),
-                    ReadDouble(recordContent, indexPoint + 8, true));
+                    readDouble(recordContent, indexPoint, true),
+                    readDouble(recordContent, indexPoint + 8, true));
             }
 
             int startZmin = startPoints + 16 * numPoints;
-            double Zmin = ReadDouble(recordContent, startZmin, true);
-            double Zmax = ReadDouble(recordContent, startZmin + 8, true);
+            double Zmin = readDouble(recordContent, startZmin, true);
+            double Zmax = readDouble(recordContent, startZmin + 8, true);
 
             double[] Zarray = new double[numPoints];
             int startZArray = startZmin + 16;
             for (int iZarray = 0; iZarray < numPoints; iZarray++)
             {
                 int indexZ = startZArray + iZarray * 8;
-                Zarray[iZarray] = ReadDouble(recordContent, indexZ, true);
+                Zarray[iZarray] = readDouble(recordContent, indexZ, true);
             }
 
             int startMmin = startZArray + 8 * numPoints;
-            double Mmin = ReadDouble(recordContent, startMmin, true);
-            double Mmax = ReadDouble(recordContent, startMmin + 8, true);
+            double Mmin = readDouble(recordContent, startMmin, true);
+            double Mmax = readDouble(recordContent, startMmin + 8, true);
 
             double[] Marray = new double[numPoints];
             int startMarray = startMmin + 16;
             for(int iMarray = 0; iMarray < numPoints; iMarray++)
             {
                 int indexM = startMarray + iMarray * 8;
-                Marray[iMarray] = ReadDouble(recordContent, indexM, true);
+                Marray[iMarray] = readDouble(recordContent, indexM, true);
             }
 
             int currentIndex = startMarray + 8 * numPoints;

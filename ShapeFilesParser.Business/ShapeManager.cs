@@ -73,9 +73,9 @@ namespace ShapeFilesParser.Business
                 int sqlTablePresence = (dBASE & 0x0E) >> 1;
                 int memoFilePresence = dBASE & 0x01;
                 DateTime lastUpdate = new DateTime(headerPart1Array[1] + 1900, headerPart1Array[2], headerPart1Array[3]);
-                int numberOfRecords = parser.ReadInt(headerPart1Array, 4, true);
-                int numberOfBytesInHeader = parser.ReadShort(headerPart1Array, 8, true);
-                int numberOfBytesInRecord = parser.ReadShort(headerPart1Array, 10, true);
+                int numberOfRecords = ReadInt(headerPart1Array, 4, true);
+                int numberOfBytesInHeader = ReadShort(headerPart1Array, 8, true);
+                int numberOfBytesInRecord = ReadShort(headerPart1Array, 10, true);
                 byte incomplete = headerPart1Array[14];
                 byte encryption = headerPart1Array[15];
                 byte productionFlag = headerPart1Array[28];
@@ -111,7 +111,7 @@ namespace ShapeFilesParser.Business
                     char fieldType = (char)fieldDescriptorArray[11];
                     byte fieldLength = fieldDescriptorArray[16];
                     byte fieldDecimal = fieldDescriptorArray[17];
-                    int workAreaID = parser.ReadShort(fieldDescriptorArray, 18, true);
+                    int workAreaID = ReadShort(fieldDescriptorArray, 18, true);
                     byte example = fieldDescriptorArray[20];
                     byte productionMDXFieldFlag = fieldDescriptorArray[31];
 
@@ -169,25 +169,25 @@ namespace ShapeFilesParser.Business
                 Dictionary<int, int> indexes = new Dictionary<int, int>();
                 byte[] headerArray = new byte[100];
                 int read = reader.Read(headerArray, 0, 100);
-                var fileCode = parser.ReadInt(headerArray, 0, false);
-                var fileLength = parser.ReadInt(headerArray, 24, false);
-                var version = parser.ReadInt(headerArray, 28, true);
-                var globalShapeType = parser.ReadInt(headerArray, 32, true);
-                var xMin = parser.ReadDouble(headerArray, 36, true);
-                var yMin = parser.ReadDouble(headerArray, 44, true);
-                var xMax = parser.ReadDouble(headerArray, 52, true);
-                var yMax = parser.ReadDouble(headerArray, 60, true);
-                var zMin = parser.ReadDouble(headerArray, 68, true);
-                var zMax = parser.ReadDouble(headerArray, 76, true);
-                var mMin = parser.ReadDouble(headerArray, 84, true);
-                var mMax = parser.ReadDouble(headerArray, 92, true);
+                var fileCode = ReadInt(headerArray, 0, false);
+                var fileLength = ReadInt(headerArray, 24, false);
+                var version = ReadInt(headerArray, 28, true);
+                var globalShapeType = ReadInt(headerArray, 32, true);
+                var xMin = ReadDouble(headerArray, 36, true);
+                var yMin = ReadDouble(headerArray, 44, true);
+                var xMax = ReadDouble(headerArray, 52, true);
+                var yMax = ReadDouble(headerArray, 60, true);
+                var zMin = ReadDouble(headerArray, 68, true);
+                var zMax = ReadDouble(headerArray, 76, true);
+                var mMin = ReadDouble(headerArray, 84, true);
+                var mMax = ReadDouble(headerArray, 92, true);
 
                 if (globalShapeType != recordShapeType) throw new InvalidOperationException($"Invalid record shape type : expected {recordShapeType} but found {globalShapeType}");
                 byte[] recordHeader = new byte[8];
                 while (reader.Read(recordHeader, 0, 8) != 0)
                 {
-                    var offset = parser.ReadInt(recordHeader, 0, false);
-                    var contentLength = parser.ReadInt(recordHeader, 4, false);
+                    var offset = ReadInt(recordHeader, 0, false);
+                    var contentLength = ReadInt(recordHeader, 4, false);
                     indexes.Add(offset, contentLength);
                 }
             }
@@ -200,36 +200,72 @@ namespace ShapeFilesParser.Business
             {
                 byte[] headerArray = new byte[100];
                 int read = reader.Read(headerArray, 0, 100);
-                var fileCode = parser.ReadInt(headerArray, 0, false);
-                var fileLength = parser.ReadInt(headerArray, 24, false);
-                var version = parser.ReadInt(headerArray, 28, true);
-                var globalShapeType = parser.ReadInt(headerArray, 32, true);
-                var xMin = parser.ReadDouble(headerArray, 36, true);
-                var yMin = parser.ReadDouble(headerArray, 44, true);
-                var xMax = parser.ReadDouble(headerArray, 52, true);
-                var yMax = parser.ReadDouble(headerArray, 60, true);
-                var zMin = parser.ReadDouble(headerArray, 68, true);
-                var zMax = parser.ReadDouble(headerArray, 76, true);
-                var mMin = parser.ReadDouble(headerArray, 84, true);
-                var mMax = parser.ReadDouble(headerArray, 92, true);
+                var fileCode = ReadInt(headerArray, 0, false);
+                var fileLength = ReadInt(headerArray, 24, false);
+                var version = ReadInt(headerArray, 28, true);
+                var globalShapeType = ReadInt(headerArray, 32, true);
+                var xMin = ReadDouble(headerArray, 36, true);
+                var yMin = ReadDouble(headerArray, 44, true);
+                var xMax = ReadDouble(headerArray, 52, true);
+                var yMax = ReadDouble(headerArray, 60, true);
+                var zMin = ReadDouble(headerArray, 68, true);
+                var zMax = ReadDouble(headerArray, 76, true);
+                var mMin = ReadDouble(headerArray, 84, true);
+                var mMax = ReadDouble(headerArray, 92, true);
 
                 if (globalShapeType != recordShapeType) throw new InvalidOperationException($"Invalid record shape type : expected {recordShapeType} but found {globalShapeType}");
                 byte[] recordHeader = new byte[8];
                 while (reader.Read(recordHeader, 0, 8) != 0)
                 {
-                    var recordNumber = parser.ReadInt(recordHeader, 0, false);
-                    var contentLength = parser.ReadInt(recordHeader, 4, false);
+                    var recordNumber = ReadInt(recordHeader, 0, false);
+                    var contentLength = ReadInt(recordHeader, 4, false);
 
                     byte[] recordContent = new byte[2 * contentLength];
                     reader.Read(recordContent, 0, 2 * contentLength);
-                    var recordShapeType = parser.ReadInt(recordContent, 0, true);
+                    var recordShapeType = ReadInt(recordContent, 0, true);
 
-                    shapes.Add(parser.Parse(recordContent));
+                    shapes.Add(parser.Parse(recordContent, new ReadIntDelegate(ReadInt), new ReadDoubleDelegate(ReadDouble)));
                 }
             }
 
             return shapes;
         }
 
+        private int ReadShort(byte[] source, int index, bool littleEndian)
+        {
+            var data = new byte[2];
+            for (int i = 0; i < 2; i++)
+            {
+                var currentIndex = index + (littleEndian ? 1 - i : i);
+                data[i] = source[currentIndex];
+            }
+            return (data[0] << 8) | (data[1]);
+        }
+
+        private int ReadInt(byte[] source, int index, bool littleEndian)
+        {
+            var data = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                var currentIndex = index + (littleEndian ? 3 - i : i);
+                data[i] = source[currentIndex];
+            }
+            return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3]);
+        }
+
+        private double ReadDouble(byte[] source, int index, bool littleEndian)
+        {
+            var data = new byte[8];
+            for (int i = 0; i < 8; i++)
+            {
+                var currentIndex = index + (littleEndian != BitConverter.IsLittleEndian ? 7 - i : i);
+                data[i] = source[currentIndex];
+            }
+            return BitConverter.ToDouble(data, 0);
+        }
+
+
     }
+    public delegate double ReadDoubleDelegate(byte[] source, int index, bool littleEndian);
+    public delegate int ReadIntDelegate(byte[] source, int index, bool littleEndian);
 }
