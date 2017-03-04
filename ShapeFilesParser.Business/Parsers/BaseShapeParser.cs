@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShapeFilesParser.Business.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace ShapeFilesParser.Business.Parsers
     public abstract class BaseShapeParser<T>
     {
         public abstract T Parse(byte[] recordContent);
+
+        public abstract GeometryType GeometryType { get; }
 
         public int ReadShort(byte[] source, int index, bool littleEndian)
         {

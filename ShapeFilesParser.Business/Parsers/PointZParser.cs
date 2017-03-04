@@ -9,6 +9,14 @@ namespace ShapeFilesParser.Business.Parsers
 {
     public class PointZParser : BaseShapeParser<PointZ>
     {
+        public override GeometryType GeometryType
+        {
+            get
+            {
+                return GeometryType.PointZ;
+            }
+        }
+
         public override PointZ Parse(byte[] recordContent)
         {
             var x = ReadDouble(recordContent, 4, true);

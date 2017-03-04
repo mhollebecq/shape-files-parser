@@ -14,6 +14,14 @@ namespace ShapeFilesParser.Business.Parsers
 
         }
 
+        public override GeometryType GeometryType
+        {
+            get
+            {
+                return GeometryType.PolygonZ;
+            }
+        }
+
         public override PolygonZ Parse(byte[] recordContent)
         {
             //PolygonZ

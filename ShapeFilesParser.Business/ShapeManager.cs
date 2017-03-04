@@ -13,10 +13,10 @@ namespace ShapeFilesParser.Business
         private BaseShapeParser<T> parser;
         private int recordShapeType;
 
-        public ShapeManager(BaseShapeParser<T> parser, int recordShapeType)
+        public ShapeManager(BaseShapeParser<T> parser)
         {
             this.parser = parser;
-            this.recordShapeType = recordShapeType;
+            this.recordShapeType = (int)parser.GeometryType;
         }
 
         /// <summary>
