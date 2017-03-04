@@ -9,11 +9,19 @@ namespace ShapeFilesParser.Business.Parsers
 {
     public class PointParser : BaseShapeParser<Point>
     {
-        public override Point Parse(byte[] recordContent)
+        public override GeometryType GeometryType
         {
-            int shapeType = ReadInt(recordContent, 0, true);
-            double x = ReadDouble(recordContent, 4, true);
-            double y = ReadDouble(recordContent, 12, true);
+            get
+            {
+                return GeometryType.Point;
+            }
+        }
+
+        public override Point Parse(byte[] recordContent, ReadIntDelegate readInt, ReadDoubleDelegate readDouble)
+        {
+            int shapeType = readInt(recordContent, 0, true);
+            double x = readDouble(recordContent, 4, true);
+            double y = readDouble(recordContent, 12, true);
 
             return new Point(x, y);
         }
