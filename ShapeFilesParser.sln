@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeFilesParser.Business",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeFilesParser.ConsoleTest", "ShapeFilesParser.ConsoleTest\ShapeFilesParser.ConsoleTest.csproj", "{78869D54-4388-4DC7-AAD7-CA79708A6D9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeFilesParser.Tests", "ShapeFilesParser.Tests\ShapeFilesParser.Tests.csproj", "{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{78869D54-4388-4DC7-AAD7-CA79708A6D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78869D54-4388-4DC7-AAD7-CA79708A6D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78869D54-4388-4DC7-AAD7-CA79708A6D9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

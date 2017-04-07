@@ -13,8 +13,8 @@ namespace ShapeFilesParser.ConsoleTest
         static void Main(string[] args)
         {
             string sourcename = @"RESEAU_ROUTIER\AERODROME";//your shape file base name
-            ShapeManager<PointZ> shapeManager = new ShapeManager<PointZ>(new Business.Parsers.PointZParser(), 11);
-            var shapes = shapeManager.ParseShapeFiles(sourcename);
+            ShapeManager shapeManager = new ShapeManager();
+            var shapes = shapeManager.GetShapes(sourcename, new Business.Parsers.PointZParser());
         }
     }
 }
