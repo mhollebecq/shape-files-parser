@@ -20,6 +20,6 @@ namespace ShapeFilesParser.Business.Models
         PolyLineM = 23,
         PolygonM = 25,
         MultiPointM = 28,
-        MultiPatch = 31,
+        MultiPath = 31,
     }
 }

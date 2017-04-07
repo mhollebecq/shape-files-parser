@@ -1,4 +1,5 @@
-﻿using ShapeFilesParser.Business.Parsers;
+﻿using ShapeFilesParser.Business.Models;
+using ShapeFilesParser.Business.Parsers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,36 +9,64 @@ using System.Threading.Tasks;
 
 namespace ShapeFilesParser.Business
 {
-    public class ShapeManager<T> where T : new()
+    public class ShapeManager
     {
-        private BaseShapeParser<T> parser;
-        private int recordShapeType;
 
-        public ShapeManager(BaseShapeParser<T> parser)
+        public ShapeManager()//BaseShapeParser<T> parser)
         {
-            this.parser = parser;
-            this.recordShapeType = (int)parser.GeometryType;
+            //this.parser = parser;
+            //this.recordShapeType = (int)parser.GeometryType;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sourceName">File name without extension</param>
-        public List<Record<T>> ParseShapeFiles(string sourceName)
+        public ShapeIndexList GetInfos(string sourceName)
         {
+
             var metadatas = ParseMetadatas(sourceName + ".dbf");
-            ParseIndex(sourceName + ".shx");
-            var shapes = ParseShp(sourceName + ".shp");
-            List<Record<T>> records = new List<Record<T>>();
-            for (int i = 0; i < shapes.Count; i++)
+            var indexList = ParseIndex(sourceName + ".shx");
+            for (int i = 0; i < indexList.Count; i++)
             {
-                Record<T> record = new Record<T>(i, shapes[i], metadatas[i]);
-                records.Add(record);
+                indexList[i].Metadatas = metadatas[i];
             }
 
-            return records;
+            return indexList;
+        }
+        
+        public List<Record<T>> GetShapes<T>(string sourceName, BaseShapeParser<T> parser)
+        {
+
+            var metadatas = ParseMetadatas(sourceName + ".dbf");
+            var shapes = ParseShp(sourceName + ".shp", parser);
+            List<Record<T>> recordList = new List<Record<T>>();
+            for (int i = 0; i < shapes.Count; i++)
+            {
+                Record<T> newRecord = new Record<T>(i, shapes[i], metadatas[i]);
+                recordList.Add(newRecord);
+            }
+
+            return recordList;
         }
 
+        public Record<T> GetShape<T>(string sourceName, BaseShapeParser<T> parser, ShapeIndex index)
+        {
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(sourceName + ".shp")))
+            {
+                byte[] bytesHeader = new byte[8];
+                byte[] bytesRecord = new byte[2* index.ContentLength];
+                reader.BaseStream.Seek(2 * index.Offset, SeekOrigin.Begin);
+                reader.Read(bytesHeader, 0, 8);
+                var recordNumber = ReadInt(bytesHeader, 0, false);
+                var contentLength = ReadInt(bytesHeader, 4, false);
+
+                reader.Read(bytesRecord, 0, 2* index.ContentLength);
+                T shape = parser.Parse(bytesRecord, ReadInt, ReadDouble);
+                Record<T> record = new Record<T>(recordNumber, shape, index.Metadatas);
+                return record;
+            }
+        }
 
 
         private List<Dictionary<string, string>> ParseMetadatas(string dbf)
@@ -162,38 +191,40 @@ namespace ShapeFilesParser.Business
             return records;
         }
 
-        private void ParseIndex(string shx)
+        private ShapeIndexList ParseIndex(string shx)
         {
             using (BinaryReader reader = new BinaryReader(File.OpenRead(shx)))
             {
-                Dictionary<int, int> indexes = new Dictionary<int, int>();
+                ShapeIndexList list = new ShapeIndexList();
                 byte[] headerArray = new byte[100];
                 int read = reader.Read(headerArray, 0, 100);
-                var fileCode = ReadInt(headerArray, 0, false);
-                var fileLength = ReadInt(headerArray, 24, false);
-                var version = ReadInt(headerArray, 28, true);
-                var globalShapeType = ReadInt(headerArray, 32, true);
-                var xMin = ReadDouble(headerArray, 36, true);
-                var yMin = ReadDouble(headerArray, 44, true);
-                var xMax = ReadDouble(headerArray, 52, true);
-                var yMax = ReadDouble(headerArray, 60, true);
-                var zMin = ReadDouble(headerArray, 68, true);
-                var zMax = ReadDouble(headerArray, 76, true);
-                var mMin = ReadDouble(headerArray, 84, true);
-                var mMax = ReadDouble(headerArray, 92, true);
+                list.FileCode = ReadInt(headerArray, 0, false);
+                list.FileLength = ReadInt(headerArray, 24, false);
+                list.Version = ReadInt(headerArray, 28, true);
+                list.GlobalShapeType = (GeometryType)ReadInt(headerArray, 32, true);
+                list.XMin = ReadDouble(headerArray, 36, true);
+                list.YMin = ReadDouble(headerArray, 44, true);
+                list.XMax = ReadDouble(headerArray, 52, true);
+                list.YMax = ReadDouble(headerArray, 60, true);
+                list.ZMin = ReadDouble(headerArray, 68, true);
+                list.ZMax = ReadDouble(headerArray, 76, true);
+                list.MMin = ReadDouble(headerArray, 84, true);
+                list.MMax = ReadDouble(headerArray, 92, true);
 
-                if (globalShapeType != recordShapeType) throw new InvalidOperationException($"Invalid record shape type : expected {recordShapeType} but found {globalShapeType}");
                 byte[] recordHeader = new byte[8];
                 while (reader.Read(recordHeader, 0, 8) != 0)
                 {
-                    var offset = ReadInt(recordHeader, 0, false);
-                    var contentLength = ReadInt(recordHeader, 4, false);
-                    indexes.Add(offset, contentLength);
+                    ShapeIndex shapeIndex = new ShapeIndex();
+                    shapeIndex.Offset = ReadInt(recordHeader, 0, false);
+                    shapeIndex.ContentLength = ReadInt(recordHeader, 4, false);
+                    list.Add(shapeIndex);
                 }
+
+                return list;
             }
         }
 
-        private List<T> ParseShp(string shp)
+        public List<T> ParseShp<T>(string shp, BaseShapeParser<T> parser)
         {
             List<T> shapes = new List<T>();
             using (BinaryReader reader = new BinaryReader(File.OpenRead(shp)))
@@ -213,7 +244,7 @@ namespace ShapeFilesParser.Business
                 var mMin = ReadDouble(headerArray, 84, true);
                 var mMax = ReadDouble(headerArray, 92, true);
 
-                if (globalShapeType != recordShapeType) throw new InvalidOperationException($"Invalid record shape type : expected {recordShapeType} but found {globalShapeType}");
+                if (globalShapeType != (int)parser.GeometryType) throw new InvalidOperationException($"Invalid record shape type : expected {parser.GeometryType} but found {globalShapeType}");
                 byte[] recordHeader = new byte[8];
                 while (reader.Read(recordHeader, 0, 8) != 0)
                 {
