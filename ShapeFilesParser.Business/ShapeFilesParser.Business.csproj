@@ -50,6 +50,7 @@
     <Compile Include="Models\PointZ.cs" />
     <Compile Include="Models\PolygonZ.cs" />
     <Compile Include="Models\Polyline.cs" />
+    <Compile Include="Models\PolylineZ.cs" />
     <Compile Include="Models\ShapeIndex.cs" />
     <Compile Include="Models\ShapeIndexList.cs" />
     <Compile Include="Parsers\BaseShapeParser.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Parsers\PointZParser.cs" />
     <Compile Include="Parsers\PolygonZParser.cs" />
     <Compile Include="Parsers\PolylineParser.cs" />
+    <Compile Include="Parsers\PolylineZParser.cs" />
     <Compile Include="Record.cs" />
     <Compile Include="ShapeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
