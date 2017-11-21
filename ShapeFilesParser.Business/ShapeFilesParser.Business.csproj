@@ -48,6 +48,7 @@
     <Compile Include="Models\GeometryType.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="Models\PointZ.cs" />
+    <Compile Include="Models\Polygon.cs" />
     <Compile Include="Models\PolygonZ.cs" />
     <Compile Include="Models\Polyline.cs" />
     <Compile Include="Models\PolylineZ.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Parsers\BaseShapeParser.cs" />
     <Compile Include="Parsers\PointParser.cs" />
     <Compile Include="Parsers\PointZParser.cs" />
+    <Compile Include="Parsers\PolygonParser.cs" />
     <Compile Include="Parsers\PolygonZParser.cs" />
     <Compile Include="Parsers\PolylineParser.cs" />
     <Compile Include="Parsers\PolylineZParser.cs" />
