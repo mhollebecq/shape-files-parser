@@ -93,6 +93,7 @@ namespace ShapeFilesParser.Business.Parsers
             int currentIndex = startMarray + 8 * numPoints;
 
             return new PolygonZ(Xmin, Xmax,
+                Ymin, Ymax,
                 numParts, numPoints,
                 partsArray, pointsArray,
                 Zmin, Zmax,
