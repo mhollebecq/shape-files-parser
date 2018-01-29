@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{78869D54-4388-4DC7-AAD7-CA79708A6D9A}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{D2EBD725-3542-4F4A-A362-F9378B0ECDDF}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ShapeFilesParser.ConsoleTest</RootNamespace>
-    <AssemblyName>ShapeFilesParser.ConsoleTest</AssemblyName>
+    <RootNamespace>ShapeFilesParser.Linq</RootNamespace>
+    <AssemblyName>ShapeFilesParser.Linq</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -43,20 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
+    <Compile Include="QueryProvider.cs" />
+    <Compile Include="ShapeQueryProvider.cs" />
+    <Compile Include="Query.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ShapeFilesParser.Business\ShapeFilesParser.Business.csproj">
       <Project>{b01eb8e5-9c4b-4886-b8c5-17fb33b570ab}</Project>
       <Name>ShapeFilesParser.Business</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ShapeFilesParser.Linq\ShapeFilesParser.Linq.csproj">
-      <Project>{d2ebd725-3542-4f4a-a362-f9378b0ecddf}</Project>
-      <Name>ShapeFilesParser.Linq</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeFilesParser.ConsoleTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeFilesParser.Tests", "ShapeFilesParser.Tests\ShapeFilesParser.Tests.csproj", "{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeFilesParser.Linq", "ShapeFilesParser.Linq\ShapeFilesParser.Linq.csproj", "{D2EBD725-3542-4F4A-A362-F9378B0ECDDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CDF1FF4-6DDF-49C0-9864-16979E4BECB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2EBD725-3542-4F4A-A362-F9378B0ECDDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2EBD725-3542-4F4A-A362-F9378B0ECDDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2EBD725-3542-4F4A-A362-F9378B0ECDDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2EBD725-3542-4F4A-A362-F9378B0ECDDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
