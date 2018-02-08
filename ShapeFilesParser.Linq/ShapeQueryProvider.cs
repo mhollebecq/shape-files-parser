@@ -7,24 +7,21 @@ using System.Threading.Tasks;
 
 namespace ShapeFilesParser.Linq
 {
-    public class ShapeQueryProvider : IQueryProvider
+    public class ShapeQueryProvider : QueryProvider
     {
-        public IQueryable CreateQuery(Expression expression)
+        public override object Execute(Expression expression)
         {
-            throw new NotImplementedException();
+            return ShapeQueryContext.Execute(expression, false);
         }
 
-        public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
+        public override TResult Execute<TResult>(Expression expression)
         {
-            throw new NotImplementedException();
+            bool isEnumerable = (typeof(TResult).Name == "IEnumerable`1");
+
+            return (TResult)ShapeQueryContext.Execute(expression, isEnumerable);
         }
 
-        public object Execute(Expression expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TResult Execute<TResult>(Expression expression)
+        public override string GetQueryText(Expression expression)
         {
             throw new NotImplementedException();
         }

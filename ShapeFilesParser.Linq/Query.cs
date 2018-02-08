@@ -58,12 +58,17 @@ namespace ShapeFilesParser.Linq
 
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>)this.Provider.Execute(this.Expression)).GetEnumerator();
+            return (this.Provider.Execute<IEnumerable<T>>(this.Expression)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)this.Provider.Execute(this.Expression)).GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return this.provider.GetQueryText(this.expression);
         }
     }
 }
