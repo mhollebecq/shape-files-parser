@@ -26,7 +26,7 @@ namespace ShapeFilesParser.ConsoleTest
         static void LinqToShape()
         {
             string sourcename = @"RESEAU_ROUTIER\AERODROME";
-            Query<Record<PointZ>> set = new Query<Record<Business.Models.PointZ>>(new ShapeQueryProvider());
+            Query<Record<PointZ>> set = new Query<Record<PointZ>>(new ShapeQueryProvider(sourcename));
             var whereResult = set.Where(s => s.Index == 2).ToList();
         }
 

@@ -9,16 +9,23 @@ namespace ShapeFilesParser.Linq
 {
     public class ShapeQueryProvider : QueryProvider
     {
+        string _sourceName;
+
+        public ShapeQueryProvider(string sourceName)
+        {
+            _sourceName = sourceName;
+        }
+
         public override object Execute(Expression expression)
         {
-            return ShapeQueryContext.Execute(expression, false);
+            return ShapeQueryContext.Execute(expression, false, _sourceName);
         }
 
         public override TResult Execute<TResult>(Expression expression)
         {
             bool isEnumerable = (typeof(TResult).Name == "IEnumerable`1");
 
-            return (TResult)ShapeQueryContext.Execute(expression, isEnumerable);
+            return (TResult)ShapeQueryContext.Execute(expression, isEnumerable, _sourceName);
         }
 
         public override string GetQueryText(Expression expression)

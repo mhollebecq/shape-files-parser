@@ -9,7 +9,7 @@ namespace ShapeFilesParser.Linq
 {
     class ShapeQueryContext
     {
-        internal static object Execute(Expression expression, bool isEnumerable)
+        internal static object Execute(Expression expression, bool isEnumerable, string sourceName)
         {
             if (!IsQueryOverDataSource(expression))
                 throw new InvalidProgramException("No query over the data source was specified");
