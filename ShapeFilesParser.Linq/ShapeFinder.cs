@@ -12,6 +12,7 @@ namespace ShapeFilesParser.Linq
     {
         private Expression expression;
         private List<string> names;
+        private List<int> ids;
 
         public ShapeFinder(Expression exp)
         {
@@ -31,6 +32,21 @@ namespace ShapeFilesParser.Linq
             }
         }
 
+
+        public List<int> Ids
+        {
+            get
+            {
+                if (ids == null)
+                {
+                    ids = new List<int>();
+                    this.Visit(this.expression);
+                }
+                return this.ids;
+            }
+        }
+
+
         protected override Expression VisitBinary(BinaryExpression be)
         {
             if(be.NodeType == ExpressionType.Equal)
@@ -38,7 +54,7 @@ namespace ShapeFilesParser.Linq
                 var typeofRecord = typeof(Record<>);
                 if (ExpressionTreeHelpers.IsMemberEqualsValueExpression(be, typeofRecord, "Index"))
                 {
-                    names.Add(ExpressionTreeHelpers.GetValueFromEqualsExpression<int>(be, typeofRecord, "Index").ToString());
+                    ids.Add(ExpressionTreeHelpers.GetValueFromEqualsExpression<int>(be, typeofRecord, "Index"));
                     return be;
                 }
                 return base.VisitBinary(be);
