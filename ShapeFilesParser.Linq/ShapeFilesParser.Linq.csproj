@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Evaluator.cs" />
     <Compile Include="ExpressionTreeHelpers.cs" />
+    <Compile Include="ExpressionTreeModifier.cs" />
     <Compile Include="InnerMostWhereFinder.cs" />
     <Compile Include="InvalidQueryException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

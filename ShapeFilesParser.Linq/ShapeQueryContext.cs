@@ -29,25 +29,87 @@ namespace ShapeFilesParser.Linq
 
             var recordType = expression.Type.GenericTypeArguments[0];// Record<T>
             var shapeType = recordType.GenericTypeArguments[0];// Shape type
-            var objects = GetShapesFromType(shapeType, sourceName, ids);
+            var enumerableRecords = GetShapesFromType(shapeType, sourceName, ids);
 
-            throw new NotImplementedException();
+            var queryableRecords = enumerableRecords.AsQueryable();
+
+            ExpressionTreeModifier treeCopier = new ExpressionTreeModifier(queryableRecords);
+            Expression newExpressionTree = treeCopier.Visit(expression);
+
+            if (isEnumerable)
+                return queryableRecords.Provider.CreateQuery(newExpressionTree);
+            else
+                return queryableRecords.Provider.Execute(newExpressionTree);
         }
 
-        private static object GetShapesFromType(Type shapeType, string sourceName, List<int> ids)
+        private static System.Collections.IEnumerable GetShapesFromType(Type shapeType, string sourceName, List<int> ids)
         {
             ShapeManager shapeManager = new ShapeManager();
             ShapeIndexList shapeIndexList = shapeManager.GetInfos(sourceName);
-            if (shapeType == typeof(Point))
+            GeometryType geometryType = GetGeometryTypeEnumFromClrType(shapeType);
+            if (geometryType != shapeIndexList.GlobalShapeType)
+                throw new ArgumentException($"source file contains {shapeIndexList.GlobalShapeType} instead of {geometryType}");
+
+            System.Collections.IEnumerable enumerable = null;
+            switch (geometryType)
             {
-                return ids.Select(id => shapeManager.GetShape(sourceName, new PointParser(), shapeIndexList[id]));
-            }
-            else if (shapeType == typeof(PointZ))
-            {
-                return ids.Select(id => shapeManager.GetShape(sourceName, new PointZParser(), shapeIndexList[id])).ToList() ;
+                case GeometryType.Point:
+                    enumerable= ids.Select(id => shapeManager.GetShape(sourceName, new PointParser(), shapeIndexList[id]));
+                    break;
+                case GeometryType.PolyLine:
+                    break;
+                case GeometryType.Polygon:
+                    break;
+                case GeometryType.MultiPoint:
+                    break;
+                case GeometryType.PointZ:
+                    ids.Select(id => shapeManager.GetShape(sourceName, new PointZParser(), shapeIndexList[id])).ToList();
+                    break;
+                case GeometryType.PolyLineZ:
+                    break;
+                case GeometryType.PolygonZ:
+                    break;
+                case GeometryType.MultiPointZ:
+                    break;
+                case GeometryType.PointM:
+                    break;
+                case GeometryType.PolyLineM:
+                    break;
+                case GeometryType.PolygonM:
+                    break;
+                case GeometryType.MultiPointM:
+                    break;
+                case GeometryType.MultiPath:
+                    break;
+                default:
+                    break;
             }
 
-            return null;
+            return enumerable;
+        }
+
+        private static GeometryType GetGeometryTypeEnumFromClrType(Type shapeType)
+        {
+            if (shapeType == typeof(Point))
+                return GeometryType.Point;
+            else if (shapeType == typeof(PointZ))
+                return GeometryType.PointZ;
+            //else if (shapeType == typeof(PointM))
+            //    return GeometryType.PointM;
+            else if (shapeType == typeof(Polygon))
+                return GeometryType.Polygon;
+            else if (shapeType == typeof(PolygonZ))
+                return GeometryType.PolygonZ;
+            //else if (shapeType == typeof(PolygonM))
+            //    return GeometryType.PolygonM;
+            else if (shapeType == typeof(Polyline))
+                return GeometryType.PolyLine;
+            else if (shapeType == typeof(PolylineZ))
+                return GeometryType.PolyLineZ;
+            //else if (shapeType == typeof(PolylineM))
+            //    return GeometryType.PolyLineM;
+
+            throw new ArgumentException($"expected type {shapeType} can not be retrieved", "shapeType");
         }
 
         private static bool IsQueryOverDataSource(Expression expression)
