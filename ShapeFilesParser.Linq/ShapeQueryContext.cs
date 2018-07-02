@@ -49,12 +49,12 @@ namespace ShapeFilesParser.Linq
             GeometryType geometryType = GetGeometryTypeEnumFromClrType(shapeType);
             if (geometryType != shapeIndexList.GlobalShapeType)
                 throw new ArgumentException($"source file contains {shapeIndexList.GlobalShapeType} instead of {geometryType}");
-
+            var filteredId = ids.Select(id => id - 1).Where(id => id > 0 && id < shapeIndexList.Count);
             System.Collections.IEnumerable enumerable = null;
             switch (geometryType)
             {
                 case GeometryType.Point:
-                    enumerable= ids.Select(id => shapeManager.GetShape(sourceName, new PointParser(), shapeIndexList[id]));
+                    enumerable= filteredId.Select(id => shapeManager.GetShape(sourceName, new PointParser(), shapeIndexList[id]));
                     break;
                 case GeometryType.PolyLine:
                     break;
@@ -63,7 +63,7 @@ namespace ShapeFilesParser.Linq
                 case GeometryType.MultiPoint:
                     break;
                 case GeometryType.PointZ:
-                    ids.Select(id => shapeManager.GetShape(sourceName, new PointZParser(), shapeIndexList[id])).ToList();
+                    enumerable = filteredId.Select(id => shapeManager.GetShape(sourceName, new PointZParser(), shapeIndexList[id])).ToList();
                     break;
                 case GeometryType.PolyLineZ:
                     break;
