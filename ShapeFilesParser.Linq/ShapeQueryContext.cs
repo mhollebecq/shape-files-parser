@@ -49,7 +49,7 @@ namespace ShapeFilesParser.Linq
             GeometryType geometryType = GetGeometryTypeEnumFromClrType(shapeType);
             if (geometryType != shapeIndexList.GlobalShapeType)
                 throw new ArgumentException($"source file contains {shapeIndexList.GlobalShapeType} instead of {geometryType}");
-            var filteredId = ids.Select(id => id - 1).Where(id => id > 0 && id < shapeIndexList.Count);
+            var filteredId = ids.Where(id => id > 0 && id <= shapeIndexList.Count).Select(id => id - 1);
             System.Collections.IEnumerable enumerable = null;
             switch (geometryType)
             {

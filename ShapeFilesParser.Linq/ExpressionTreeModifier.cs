@@ -25,5 +25,10 @@ namespace ShapeFilesParser.Linq
             else
                 return c;
         }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            return base.VisitMethodCall(node);
+        }
     }
 }

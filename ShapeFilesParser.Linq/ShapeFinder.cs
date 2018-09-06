@@ -57,6 +57,15 @@ namespace ShapeFilesParser.Linq
                     ids.Add(ExpressionTreeHelpers.GetValueFromEqualsExpression<int>(be, typeofRecord, "Index"));
                     return be;
                 }
+                else if(ExpressionTreeHelpers.IsMethodCallEqualsValueExpression(be,
+                                                                                typeofRecord, 
+                                                                                "Metadata",
+                                                                                "get_Item"))
+                {
+                    var temp = ExpressionTreeHelpers.GetValueFromMethodCallExpression<string>(be, typeofRecord,
+                                                                                "Metadata",
+                                                                                "get_Item");
+                }
                 return base.VisitBinary(be);
             }
             

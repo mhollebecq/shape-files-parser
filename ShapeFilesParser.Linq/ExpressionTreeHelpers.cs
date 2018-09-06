@@ -32,6 +32,39 @@ namespace ShapeFilesParser.Linq
                 (((MemberExpression)exp).Member.Name == memberName));
         }
 
+        internal static TRet GetValueFromMethodCallExpression<TRet>(BinaryExpression be,
+            Type declaringType,
+            string memberName,
+            string methodName)
+        {
+            if (be.NodeType != ExpressionType.Equal)
+                throw new Exception("There is a bug in this program.");
+
+            if (be.Left.NodeType == ExpressionType.Call)
+            {
+                MethodCallExpression me = (MethodCallExpression)be.Left;
+                //(((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
+                //(((MemberExpression)me.Object).Member.Name == memberName)
+                if (((MemberExpression)me.Object).Member.Name == memberName && ((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
+                {
+                    var parameter = GetValueFromExpression<string>(me.Arguments[0]);
+                    return GetValueFromExpression<TRet>(be.Right);
+                }
+            }
+            else if (be.Right.NodeType == ExpressionType.Call)
+            {
+                MethodCallExpression me = (MethodCallExpression)be.Right;
+
+                if (((MemberExpression)me.Object).Member.Name == memberName && ((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
+                {
+                    return GetValueFromExpression<TRet>(be.Left);
+                }
+            }
+
+            // We should have returned by now. 
+            throw new Exception("There is a bug in this program.");
+        }
+
         internal static TRet GetValueFromEqualsExpression<TRet>(BinaryExpression be, Type memberDeclaringType, string memberName)
         {
             if (be.NodeType != ExpressionType.Equal)
@@ -58,6 +91,42 @@ namespace ShapeFilesParser.Linq
 
             // We should have returned by now. 
             throw new Exception("There is a bug in this program.");
+        }
+
+        internal static bool IsMethodCallEqualsValueExpression(BinaryExpression be, 
+            Type declaringType,
+            string memberName, 
+            string methodName)
+        {
+            if (be.NodeType != ExpressionType.Equal)
+                return false;
+
+
+            //// Assert. 
+            //if (ExpressionTreeHelpers.IsSpecificMemberExpression(be.Left, declaringType, memberName) &&
+            //    ExpressionTreeHelpers.IsSpecificMemberExpression(be.Right, declaringType, memberName))
+            //    throw new Exception("Cannot have 'member' == 'member' in an expression!");
+
+            return (ExpressionTreeHelpers.IsSpecificMethodCallExpression(be.Left, declaringType, memberName, methodName) !=
+                ExpressionTreeHelpers.IsSpecificMethodCallExpression(be.Right, declaringType, memberName, methodName));
+        }
+
+        internal static bool IsSpecificMethodCallExpression(Expression exp, Type declaringType, string memberName, string methodName)
+        {
+            return ((exp is MethodCallExpression) &&
+                AssertDeclaringTypeForMethodCall((MethodCallExpression)exp, declaringType) &&
+                AssertMemberNameForMethodCall((MethodCallExpression)exp, memberName) &&
+                (((MethodCallExpression)exp).Method.Name == methodName));
+        }
+
+        private static bool AssertDeclaringTypeForMethodCall(MethodCallExpression exp, Type declaringType)
+        {
+            return (((MemberExpression)exp.Object).Expression.Type.Name == declaringType.Name);
+        }
+
+        private static bool AssertMemberNameForMethodCall(MethodCallExpression exp, string memberName)
+        {
+            return (((MemberExpression)exp.Object).Member.Name == memberName);
         }
 
         internal static TRet GetValueFromExpression<TRet>(Expression expression)
