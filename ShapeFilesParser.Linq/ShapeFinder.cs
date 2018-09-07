@@ -11,25 +11,12 @@ namespace ShapeFilesParser.Linq
     class ShapeFinder : ExpressionVisitor
     {
         private Expression expression;
-        private List<string> names;
         private List<int> ids;
+        private List<(string key, string value)> metadata;
 
         public ShapeFinder(Expression exp)
         {
             this.expression = exp;
-        }
-
-        public List<string> Names
-        {
-            get
-            {
-                if (names == null)
-                {
-                    names = new List<string>();
-                    this.Visit(this.expression);
-                }
-                return this.names;
-            }
         }
 
 
@@ -39,13 +26,30 @@ namespace ShapeFilesParser.Linq
             {
                 if (ids == null)
                 {
-                    ids = new List<int>();
-                    this.Visit(this.expression);
+                    InitializeFieldsAndVisit();
                 }
                 return this.ids;
             }
         }
 
+        public List<(string key,string value)> Metadata
+        {
+            get
+            {
+                if(metadata == null)
+                {
+                    InitializeFieldsAndVisit();
+                }
+                return this.metadata;
+            }
+        }
+
+        protected void InitializeFieldsAndVisit()
+        {
+            ids = new List<int>();
+            metadata = new List<(string key, string value)>();
+            this.Visit(this.expression);
+        }
 
         protected override Expression VisitBinary(BinaryExpression be)
         {
@@ -62,9 +66,10 @@ namespace ShapeFilesParser.Linq
                                                                                 "Metadata",
                                                                                 "get_Item"))
                 {
-                    var temp = ExpressionTreeHelpers.GetValueFromMethodCallExpression<string>(be, typeofRecord,
+                    metadata.Add(ExpressionTreeHelpers.GetValueFromMethodCallExpression<string,string>(be, typeofRecord,
                                                                                 "Metadata",
-                                                                                "get_Item");
+                                                                                "get_Item"));
+                    return be;
                 }
                 return base.VisitBinary(be);
             }

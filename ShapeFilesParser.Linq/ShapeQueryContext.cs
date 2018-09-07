@@ -24,12 +24,13 @@ namespace ShapeFilesParser.Linq
             lambdaExpression = (LambdaExpression)Evaluator.PartialEval(lambdaExpression);
             ShapeFinder sf = new ShapeFinder(lambdaExpression.Body);
             List<int> ids = sf.Ids;
-            if (ids.Count == 0)
-                throw new InvalidQueryException("You must specifiy at least one Index in your query");
+            List<(string key, string value)> metadata = sf.Metadata;
+            if (ids.Count == 0 && metadata.Count == 0)
+                throw new InvalidQueryException("You must specifiy at least one Index or metadata access in your query");
 
             var recordType = expression.Type.GenericTypeArguments[0];// Record<T>
             var shapeType = recordType.GenericTypeArguments[0];// Shape type
-            var enumerableRecords = GetShapesFromType(shapeType, sourceName, ids);
+            var enumerableRecords = GetShapesFromType(shapeType, sourceName, ids, metadata);
 
             var queryableRecords = enumerableRecords.AsQueryable();
 
@@ -42,14 +43,18 @@ namespace ShapeFilesParser.Linq
                 return queryableRecords.Provider.Execute(newExpressionTree);
         }
 
-        private static System.Collections.IEnumerable GetShapesFromType(Type shapeType, string sourceName, List<int> ids)
+        private static System.Collections.IEnumerable GetShapesFromType(Type shapeType, string sourceName, List<int> ids, List<(string key, string value)> metadata)
         {
             ShapeManager shapeManager = new ShapeManager();
             ShapeIndexList shapeIndexList = shapeManager.GetInfos(sourceName);
             GeometryType geometryType = GetGeometryTypeEnumFromClrType(shapeType);
             if (geometryType != shapeIndexList.GlobalShapeType)
                 throw new ArgumentException($"source file contains {shapeIndexList.GlobalShapeType} instead of {geometryType}");
-            var filteredId = ids.Where(id => id > 0 && id <= shapeIndexList.Count).Select(id => id - 1);
+            var filteredId = ids
+                .Concat(GetShapesIdFromMetadata(metadata, shapeIndexList))
+                .Distinct()
+                .Where(id => id > 0 && id <= shapeIndexList.Count)
+                .Select(id => id - 1);
             System.Collections.IEnumerable enumerable = null;
             switch (geometryType)
             {
@@ -110,6 +115,16 @@ namespace ShapeFilesParser.Linq
             //    return GeometryType.PolyLineM;
 
             throw new ArgumentException($"expected type {shapeType} can not be retrieved", "shapeType");
+        }
+
+        private static IEnumerable<int> GetShapesIdFromMetadata(List<(string key, string value)> metadata, ShapeIndexList shapeIndices)
+        {
+            foreach(var data in metadata)
+            {
+                var index = shapeIndices.FirstOrDefault(si => si.Metadatas[data.key] == data.value);
+                if (index != null)
+                    yield return shapeIndices.IndexOf(index) + 1;
+            }
         }
 
         private static bool IsQueryOverDataSource(Expression expression)

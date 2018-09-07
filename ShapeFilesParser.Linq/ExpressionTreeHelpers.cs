@@ -32,7 +32,7 @@ namespace ShapeFilesParser.Linq
                 (((MemberExpression)exp).Member.Name == memberName));
         }
 
-        internal static TRet GetValueFromMethodCallExpression<TRet>(BinaryExpression be,
+        internal static (TParam, TRet) GetValueFromMethodCallExpression<TParam, TRet>(BinaryExpression be,
             Type declaringType,
             string memberName,
             string methodName)
@@ -43,21 +43,24 @@ namespace ShapeFilesParser.Linq
             if (be.Left.NodeType == ExpressionType.Call)
             {
                 MethodCallExpression me = (MethodCallExpression)be.Left;
-                //(((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
-                //(((MemberExpression)me.Object).Member.Name == memberName)
-                if (((MemberExpression)me.Object).Member.Name == memberName && ((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
+                if (((MemberExpression)me.Object).Member.Name == memberName 
+                    && ((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
                 {
-                    var parameter = GetValueFromExpression<string>(me.Arguments[0]);
-                    return GetValueFromExpression<TRet>(be.Right);
+                    var parameter = GetValueFromExpression<TParam>(me.Arguments[0]);
+                    var value = GetValueFromExpression<TRet>(be.Right);
+                    return (parameter, value);
                 }
             }
             else if (be.Right.NodeType == ExpressionType.Call)
             {
                 MethodCallExpression me = (MethodCallExpression)be.Right;
 
-                if (((MemberExpression)me.Object).Member.Name == memberName && ((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
+                if (((MemberExpression)me.Object).Member.Name == memberName
+                    && ((MemberExpression)me.Object).Expression.Type.Name == declaringType.Name)
                 {
-                    return GetValueFromExpression<TRet>(be.Left);
+                    var parameter = GetValueFromExpression<TParam>(me.Arguments[0]);
+                    var value = GetValueFromExpression<TRet>(be.Left);
+                    return (parameter, value);
                 }
             }
 
